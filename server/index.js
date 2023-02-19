@@ -1,8 +1,8 @@
+const { App } = "client/src/App.js";
 const express = require('express');
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
-
 const cors = require("cors");
 
 app.use(cors());
@@ -11,15 +11,17 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "https://localhost:3000",
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"],
     },
-});
-
-io.on("connection", (socket) => {
-    console.log(`User Connected: ${socket.id}`);
 });
 
 server.listen(3001, () => {
     console.log("SERVER IS RUNNING");
 });
+io.on("connection", (socket) => {
+    console.log("User Connected"); // ${socket.id}
+
+});
+
+
