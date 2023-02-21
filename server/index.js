@@ -18,6 +18,7 @@ const io = new Server(server, {
     },
 });
 
+var playerTurn = 0;
 
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
@@ -26,9 +27,14 @@ io.on("connection", (socket) => {
         socket.join(data);
     });
 
-    socket.on("send_message", (data) => {
-        console.log(data);
-        socket.to(data.room).emit("receive_message", data);
+    socket.on("take_turn", (data) => { //? Maybe change "send message" to be like take turn (do on  both sides)
+        if (playerTurn == 0) {
+            console.log(data);
+            playerTurn++;
+        } else {//TODO -send back ammo(both peeps) -if alive -what button both peeps had
+            playerTurn = 0;
+            socket.to(data.room).emit("update_UI", data); //?  change "receive_message" to turn over and update UI (on both sides)
+        }
     });
 
 });
