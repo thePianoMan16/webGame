@@ -9,63 +9,67 @@ function App() {
 
   const [message, setMessage] = useState("");
   const [messageReceived, setMessageReceived] = useState("");
-  const [player, setPlayer] = useState("");
+  const [player, setPlayer] = useState(0);
+  const [started, setStarted] = useState(false);
   
   const joinRoom = () => {
     if (room !== "") {
+      console.log(`Emitting Room number: ${room}`);
       socket.emit("join_room", room);
     }
   }
+
   
-  const sendMessage = () => {
-    socket.emit("take_turn", { message, room });
+  const sendMessage = (btnId, pId) => {
+    socket.emit("take_turn", { btnId, pId, room });
   };
 
   useEffect(() => {
     socket.on("update_UI", (data) => {
       setMessageReceived(data.message);
     });
+
+    socket.on("start_game", (data) => {
+      setPlayer(data.playerTurn);
+      console.log(`I am player ${player}`);
+    })
   }, [socket])
 
-  return ( //! --------------------------------------------- ALL HTML HERE
+  var ammo1 = 0;
+  var ammo2 = 0;
+
+  return ( //TODO --------------------------------------------- ALL HTML HERE
     <div className="App">
+      <br></br>
       <input
       placeholder='Room Code...'
       onChange={(event) => {
+        console.log(`Set Room ${event.target.value}`);
         setRoom(event.target.value);
       }}
       />
       <button onClick={joinRoom}> Join Room</button>
-      <input
-      placeholder='Message...'
-      onChange={(event) => {
-        setMessage(event.target.value);
-      }}
-      />
-      <button onClick={sendMessage}> Send Message</button>
-    <h1>Message:</h1>
-    {messageReceived}
 
-    <div class="container">
-      <div class="left">
-        <h2>User 1</h2>  
+    <div className="container">
+      <div className="left">
+        <h2>Player 1</h2>  
         {/* //! Change to say what their userid is */}
         <p id="am1">0</p>
-        <img src={require('./images/p1.png')} alt="Player 1" class="stickman"/>
-        <div class="button-container">
-          <button class="button" onclick="updateGame(1)">Reload</button>
-          <button class="button" onclick="updateGame(2)">Shoot</button>
-          <button class="button" onclick="updateGame(3)">Block</button>
+        <img src={require('./images/p1.png')} alt="Player 1" className="stickman"/>
+        <div className="button-container">
+          <button className="button" onClick={() => {sendMessage(0, 0)}}>Reload</button> 
+          <button className="button" onClick={() => {sendMessage(1, 0)}}>Shoot</button>
+          <button className="button" onClick={() => {sendMessage(2, 0)}}>Block</button>
         </div>
       </div>
-      <div class="right">
-        <h2>User 2</h2>
+      <div className="right">
+        <h2>Player 2</h2>
         <p id="am2">0</p>
-        <img src={require('./images/p21.png')} alt="Player 2" id="p2" class="stickman"/>
-        <div class="button-container">
-          <button class="button" onclick="updateGame(4)">Reload</button>
-          <button class="button" onclick="updateGame(5)">Shoot</button>
-          <button class="button" onclick="updateGame(6)">Block</button>
+        <img src={require('./images/p21.png')} alt="Player 2" id="p2" className="stickman"/>
+        <div className="button-container">
+          <button className="button" onClick={() => {sendMessage(0, 1)}}>Reload</button>
+          <button className="button" onClick={() => {sendMessage(1, 1)}}>Shoot</button>
+          <button className="button" onClick={() => {sendMessage(2, 1)}}>Block</button>
         </div>
       </div>
     </div>
