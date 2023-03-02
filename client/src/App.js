@@ -14,6 +14,10 @@ function App() {
   const [messageReceived, setMessageReceived] = useState("");
   const [player, setPlayer] = useState(0);
   const [started, setStarted] = useState(false);
+  const [ammo1, setAmmo1] = useState(0);
+  const [ammo2, setAmmo2] = useState(0);
+  const [p1Choice, setP1Choice] = useState(0);
+  const [p2Choice, setP2Choice] = useState(0);
   
   const joinRoom = () => {
     if (room !== "") {
@@ -28,7 +32,7 @@ function App() {
   }; //*
 
   useEffect(() => {
-    socket.on("update_UI", (data) => {
+    socket.on("update_UI", (data) => { //TODO: -Set Ammo for each player and use all information from data to set everything here.
       setMessageReceived(data.message);
     });
 
@@ -36,13 +40,10 @@ function App() {
       setPlayer(data.playerTurn);
       console.log(`I am player ${player}`);
     })
-  }, [socket])
-
-  var ammo1 = 0;
-  var ammo2 = 0;
+  }, [socket, player])
 
 
-  return ( //TODO --------------------------------------------- ALL HTML HERE
+  return ( //* --------------------------------------------- ALL HTML HERE
     <div className="App">
       <br></br>
       <input
@@ -57,26 +58,39 @@ function App() {
     <div className="container">
       {/* insert code here  (this <buttons/> )*/}
     <div className="left">
-            <h2>Player 1</h2>  
-            {/* //! Change to say what their userid is */}
-            <p id="am1">0</p>
+            <h2>Player 1</h2>
+            {/* //TODO CHANGE PLAYER TYPE TO PLAYER!!!. */}
+            {playerType === 0 ? <p id="am1">{ ammo1 }</p> : <p>-</p>}
             <img src={require('./images/p1.png')} alt="Player 1" className="stickman"/>
+            {playerType === 0 ? 
             <div className="button-container">
               <button className="button" onClick={() => {sendMessage(0, 0)}}>Reload</button>
               <button className="button" onClick={() => {sendMessage(1, 0)}}>Shoot</button>
               <button className="button" onClick={() => {sendMessage(2, 0)}}>Block</button>
-            </div>
+            </div> : 
+            <div className="button-container">
+            <button className="button" disabled>Reload</button>
+            <button className="button" disabled>Shoot</button>
+            <button className="button" disabled>Block</button>
+          </div>}
           </div>
           <div className="right">
             <h2>Player 2</h2>
-            <p id="am2">0</p>
+            {playerType === 1 ? <p id="am2">{ ammo2 }</p> : <p>-</p>}
             <img src={require('./images/p21.png')} alt="Player 2" id="p2" className="stickman"/>
-            {/*//TODO pretend we are user 0 and try to make the if code. Use google */}
-            <div className="button-container">
-              <button className="button" onClick={() => {sendMessage(0, 1)}}>Reload</button>
-              <button className="button" onClick={() => {sendMessage(1, 1)}}>Shoot</button>
-              <button className="button" onClick={() => {sendMessage(2, 1)}}>Block</button>
-            </div>
+            {playerType === 1 ?
+              <div className="button-container">
+                <button className="button" onClick={() => {sendMessage(0, 1)}}>Reload</button>
+                <button className="button" onClick={() => {sendMessage(1, 1)}}>Shoot</button>
+                <button className="button" onClick={() => {sendMessage(2, 1)}}>Block</button>
+              </div> 
+            : 
+              <div className="button-container">
+                <button className="button" disabled>Reload</button>
+                <button className="button" disabled>Shoot</button>
+                <button className="button" disabled>Block</button>
+              </div>
+          }
 
   </div>
 
@@ -86,56 +100,6 @@ function App() {
   );
 }  //! -------------------------------------------------------------- END
 
-const buttons = () => {
-  // const sendMessage = (btnId, pId) => {
-  //   socket.emit("take_turn", { btnId, pId, room });
-  // };
-
-  if (playerType = 0) {
-  //   return(
-  //     <div>
-  //     <div className="left">
-  //       <h2>Player 1</h2>
-  //       {/* //! Change to say what their userid is */}
-  //       <p id="am1">0</p>
-  //       <img src={require('./images/p1.png')} alt="Player 1" className="stickman"/>
-  //       <div className="button-container">
-  //         <button className="button" onClick={() => {sendMessage(0, 0)}}>Reload</button>
-  //         <button className="button" onClick={() => {sendMessage(1, 0)}}>Shoot</button>
-  //         <button className="button" onClick={() => {sendMessage(2, 0)}}>Block</button>
-  //       </div>
-  //     </div>
-  //     <div className="right">
-  //       <h2>Player 2</h2>
-  //       <p id="am2">0</p>
-  //       <img src={require('./images/p21.png')} alt="Player 2" id="p2" className="stickman"/>
-
-  //     </div>
-  //     </div>
-  //   )
-  // } else {
-  //   <div>
-  //     <div className="left">
-  //       <h2>Player 1</h2>  
-  //       {/* //! Change to say what their userid is */}
-  //       <p id="am1">0</p>
-  //       <img src={require('./images/p1.png')} alt="Player 1" className="stickman"/>
-  //     </div>
-  //     <div className="right">
-  //       <h2>Player 2</h2>
-  //       <p id="am2">0</p>
-  //       <img src={require('./images/p21.png')} alt="Player 2" id="p2" className="stickman"/>
-  //       {/*//TODO pretend we are user 0 and try to make the if code. Use google */}
-  //       <div className="button-container">
-  //         <button className="button" onClick={() => {sendMessage(0, 1)}}>Reload</button>
-  //         <button className="button" onClick={() => {sendMessage(1, 1)}}>Shoot</button>
-  //         <button className="button" onClick={() => {sendMessage(2, 1)}}>Block</button>
-  //       </div>
-
-  //     </div>
-  //     </div>
-  }
-}
 
 export default App;
 

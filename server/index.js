@@ -23,6 +23,8 @@ var ammo1 = 0;
 var ammo2 = 0;
 var p1Choice = 0;
 var p2Choice = 0;
+var p1HP = 1;
+var p2HP = 1;
 
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
@@ -66,24 +68,43 @@ io.on("connection", (socket) => {
             }
             playerTurn = 0;
 
-            if (p1Choice == 0 && p2Choice == 1) {
-                //Game ends, p2 wins
-            } else if (p1Choice == 1 && p2Choice == 0) {
-                //game ends, p1 wins
-            } else if (p1Choice == 0 && p2Choice == 0) {
-                // ammo increases
-            } else if (p1Choice == 1 && p2Choice == 1) {
-                // ammo decreases. game continues.
-            } else if (p1Choice == 2 && p2Choice == 2) {
-                // do nothing
-            } else if (p1Choice == 1 && p2Choice == 2) {
-                //p1 ammo decrease
-            } else if (p1Choice == 2 && p2Choice == 1) {
-                //p2 ammo decrease
+            //TODO analyze state here: send back ammo(both peeps) -if alive -what button both peeps had pressed
+            if (p1Choice > -1 && p2Choice > -1) {
+                if (p1Choice == 0 && p2Choice == 1) { // game ends, p2 wins
+                    p1HP = 0;
+                } else if (p1Choice == 1 && p2Choice == 0) {
+                    //game ends, p1 wins
+                    p2HP = 0;
+                } else if (p1Choice == 0 && p2Choice == 0) {
+                    // ammo increases
+                    ammo1++;
+                    ammo2++;
+                } else if (p1Choice == 1 && p2Choice == 1) {
+                    // ammo decreases. game continues.
+                    ammo1--;
+                    ammo2--;
+                } else if (p1Choice == 2 && p2Choice == 2) {
+                    // do nothing
+                } else if (p1Choice == 1 && p2Choice == 2) {
+                    //p1 ammo decrease
+                    ammo1--;
+                } else if (p1Choice == 2 && p2Choice == 1) {
+                    //p2 ammo decrease
+                    ammo2--;
+                } else if (p1Choice == 0 && p2Choice == 2) {
+                    //p1 ammo increase
+                    ammo1++;
+                } else if (p1Choice == 2 && p1Choice == 0) {
+                    //p2 ammo increase
+                    ammo2++;
+                }
+                data = { p1Choice, p2Choice, ammo1, ammo2, p1HP, p2HP };
+                
+                socket.to(data.room).emit("update_UI", data);
+                p1Choice = -1;
+                p2Choice = -1;
             }
             
-            //TODO analyze state here: send back ammo(both peeps) -if alive -what button both peeps had pressed
-            socket.to(data.room).emit("update_UI", data); //?  change "receive_message" to turn over and update UI (on both sides)
         }
     });
 
